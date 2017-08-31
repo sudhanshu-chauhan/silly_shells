@@ -1,5 +1,7 @@
 .idea/
 *.pyc
-silly_shells.sublime-project
-silly_shells.sublime-workspace
+silly-shells.sublime-project
+silly-shells.sublime-workspace
 tests/.cache/
+logs/
+.cache
