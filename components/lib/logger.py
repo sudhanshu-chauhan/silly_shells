@@ -1,7 +1,7 @@
 import logging
 import os
 
-from components.conf import settings
+from conf import settings
 
 
 class Logger:
@@ -20,7 +20,7 @@ class Logger:
         :param file_handler:
         """
         try:
-        	
+
             if file_name is None:
                 raise Exception("log file name not defined")
 
@@ -30,11 +30,13 @@ class Logger:
                 self.log_dir = log_dir
 
             self.logger = logging.getLogger(name=file_name)
-            log_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            log_format = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
             self.logger.setLevel(logging.DEBUG)
 
             if file_handler:
-                self.file_handler = logging.FileHandler(os.path.join(self.log_dir, file_name))
+                self.file_handler = logging.FileHandler(
+                    os.path.join(self.log_dir, file_name))
                 self.file_handler.setFormatter(log_format)
                 self.file_handler.setLevel(logging.DEBUG)
                 self.logger.addHandler(self.file_handler)
@@ -44,7 +46,6 @@ class Logger:
                 self.stream_handler.setFormatter(log_format)
                 self.stream_handler.setLevel(logging.DEBUG)
                 self.logger.addHandler(self.stream_handler)
-
 
         except Exception as err:
             print "logger::init: {}".format(err.message)
