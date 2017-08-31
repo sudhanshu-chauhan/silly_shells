@@ -4,6 +4,7 @@ from conf import settings
 
 
 class DBConfiguration:
+
     def __init__(self):
         self.config_file_path = settings.CONFIG_FILE_PATH
         self.config_parser = ConfigParser()
