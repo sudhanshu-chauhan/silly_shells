@@ -1,7 +1,8 @@
 import socket
 import set_src_package
 set_src_package.set_src()
-from components.common_utils import commons
+
+from components.lib import commons
 
 
 class TestCommons:
@@ -20,4 +21,4 @@ class TestCommons:
             server_sock.close()
 
         except Exception as err:
-            print err.message
+            print(err.message)
