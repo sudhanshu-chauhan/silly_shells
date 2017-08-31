@@ -3,7 +3,8 @@ import uuid
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-from models import User, Token, SecurityCredential
+from models import (User,
+                    SecurityCredential)
 
 
 database_url = 'postgresql://postgres:random123@localhost/silly_shells'
@@ -34,7 +35,7 @@ class HandleDB:
             current_user = User(**user_params)
             self.session_instance.add(current_user)
             self.session_instance.commit()
-            return True
+            return current_user
         except Exception as error:
             print('HandleDB::create_user:{}'.format(error.message))
             return False
@@ -54,27 +55,10 @@ class HandleDB:
             )
             self.session_instance.add(security_credential_instance)
             self.session_instance.commit()
-            return True
+            return security_credential_instance
 
         except Exception as error:
             print('HandleDB::create_security_credential:{}'.format(
                 error.message
             ))
-            return False
-
-    def create_token(self, **token_params):
-        """Create Token method for HandleDB class.
-
-        Args:
-            token_params (Dict): key, value param for token object creation.
-
-        """
-        try:
-            token_params['uuid'] = str(uuid.uuid4())
-            current_token_instance = Token(**token_params)
-            self.session_instance.add(current_token_instance)
-            self.session_instance.commit()
-            return True
-        except Exception as error:
-            print('HandleDB::create_token:{}'.format(error.message))
             return False
