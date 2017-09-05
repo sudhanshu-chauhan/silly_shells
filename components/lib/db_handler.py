@@ -5,12 +5,16 @@ from sqlalchemy import create_engine
 
 from models import (User,
                     SecurityCredential)
+from conf.settings import DATABASE_URL
+from logger import Logger
 
 
-database_url = 'postgresql://postgres:random123@localhost/silly_shells'
-engine = create_engine(database_url)
-
-Session = sessionmaker(bind=engine)
+logger_params = {
+    'file_name': 'error.log',
+    'file_handler': True,
+    'stream_handler': False
+}
+logger_instance = Logger(**logger_params)
 
 
 class HandleDB:
@@ -21,7 +25,14 @@ class HandleDB:
         """
         HandleDB __init__ method.
         """
-        self.session_instance = Session()
+        try:
+            self.engine = create_engine(DATABASE_URL)
+            Session = sessionmaker(bind=self.engine)
+
+            self.session_instance = Session()
+        except Exception as error:
+            logger_instance.logger.error(
+                'HandleDB::__init__:{}'.format(error.message))
 
     def create_user(self, **user_params):
         """Create User method for HandleDB class
@@ -37,7 +48,8 @@ class HandleDB:
             self.session_instance.commit()
             return current_user
         except Exception as error:
-            print('HandleDB::create_user:{}'.format(error.message))
+            logger_instance.logger.error(
+                'HandleDB::create_user:{}'.format(error.message))
             return False
 
     def create_security_credential(self, **secureity_credential_params):
@@ -58,7 +70,7 @@ class HandleDB:
             return security_credential_instance
 
         except Exception as error:
-            print('HandleDB::create_security_credential:{}'.format(
+            logger_instance.logger.error('HandleDB::create_security_credential:{}'.format(
                 error.message
             ))
             return False
