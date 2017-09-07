@@ -112,7 +112,7 @@ class MainApplication(Application):
 def main():
     app_instance = MainApplication()
     print('[*] started socket server at 8001')
-    app_instance.listen(8001)
+    app_instance.listen(8001, address='0.0.0.0')
     IOLoop.instance().start()
 
 
