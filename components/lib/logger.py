@@ -48,4 +48,4 @@ class Logger:
                 self.logger.addHandler(self.stream_handler)
 
         except Exception as err:
-            print "logger::init: {}".format(err.message)
+            print("logger::init: {}".format(err.message))
