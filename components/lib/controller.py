@@ -43,3 +43,30 @@ class UserController:
             logger_instance.logger.error(
                 'UserController::authenticate:{}'.format(error.message))
             return False
+
+
+class ClientController:
+    """ClientController class to deal with client information exchange."""
+
+    def __init__(self):
+        pass
+
+    def get_client_stats(self):
+        """method to get client cpu/memorh usage."""
+        # code goes here
+
+    def get_process_stats(self, pid):
+        """method to get stat of process running at client side."""
+        # code goes here
+
+    def reboot_client(self):
+        """method to reboot remote client."""
+        # code goes here
+
+    def get_camera_shot(self):
+        """method to get camera shot of the remote client machine."""
+        # code goes here
+
+    def get_client_details(self):
+        """method to fetch client details of remote machine."""
+        # code goes here
