@@ -21,7 +21,10 @@ class User(Base):
     uuid = Column(String, primary_key=True)
     first_name = Column(String)
     last_name = Column(String)
-    email = Column(String)
+    email = Column(String, unique=True)
+    security_credential = Column(String,
+                                 ForeignKey('security_credential.uuid'),
+                                 nullable=False)
 
 
 class SecurityCredential(Base):
@@ -32,18 +35,6 @@ class SecurityCredential(Base):
 
     uuid = Column(String, primary_key=True)
     password_hash = Column(String)
-    user = Column(String, ForeignKey('user.uuid'), nullable=False)
-
-
-class Token(Base):
-    """
-    Token models class for user token authentication.
-    """
-    __tablename__ = "token"
-    uuid = Column(String, primary_key=True)
-    security_credential = Column(String,
-                                 ForeignKey('security_credential.uuid'),
-                                 nullable=False)
 
 
 class ClientMachine(Base):
