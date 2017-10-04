@@ -74,31 +74,54 @@ class Client:
             return False
 
 
-def on_message(ws, message):
-    print(message)
+class ClientSocketHandler:
+    """ClientSocketHandler class for client socket events."""
 
+    def __init__(self):
+        pass
 
-def on_error(ws, error):
-    print(error)
+    @staticmethod
+    def on_message(websocket_instance, message):
+        """on_message event handler for client socket."""
+        try:
+            print(message)
+        except Exception as error:
+            logger_instance.logger.error(
+                'ClientSocketHandler::on_message:{}'.format(
+                    error.message))
 
+    @staticmethod
+    def on_error(websocket_instance, error):
+        """on_error event handler for client socket."""
+        logger_instance.logger.error(
+            'ClientSocketHandler::on_error:{}'.format(
+                error))
 
-def on_close(ws):
-    print("### client closed ###")
+    @staticmethod
+    def on_close(websocket_instance):
+        """on_close event handler for client socket."""
+        try:
+            print('[*]client socket closed...')
+        except Exception as error:
+            logger_instance.logger.error(
+                'ClientSocketHandler::on_error:{}'.format(
+                    error.message))
 
 
 def on_open(ws):
     logger_instance_info.logger.info('opened socket connection')
 
 if __name__ == '__main__':
-    client_instance = Client(server='192.168.16.37', port=8001)
-    credential_param = {'email': 'sudhanshu@radiowalla.in',
-                        'password': 'testg'}
-    header = {'Authorization': client_instance.get_token(**credential_param)}
+    client_instance = Client(server=config_instance.get('server', 'url'),
+                             port=int(config_instance.get('server', 'port')))
+    header = {'Authorization': config_instance.get('client', 'token')}
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp('ws://localhost:8001/sock_server/',
-                                header=header,
-                                on_message=on_message,
-                                on_error=on_error,
-                                on_close=on_close)
+    ws = websocket.WebSocketApp(
+        'ws://{}:{}/sock_server/'.format(client_instance.server,
+                                         client_instance.port),
+        header=header,
+        on_message=ClientSocketHandler.on_message,
+        on_error=ClientSocketHandler.on_error,
+        on_close=ClientSocketHandler.on_close)
     ws.on_open = on_open
     ws.run_forever()
