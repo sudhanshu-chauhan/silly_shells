@@ -81,6 +81,15 @@ class ClientSocketHandler:
         pass
 
     @staticmethod
+    def on_open(websocket_instance):
+        try:
+            logger_instance_info.logger.info('socket opened')
+        except Exception as error:
+            logger_instance.logger.error(
+                'ClientSocketHandler::on_open:{}'.format(
+                    error.message))
+
+    @staticmethod
     def on_message(websocket_instance, message):
         """on_message event handler for client socket."""
         try:
