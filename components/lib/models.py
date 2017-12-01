@@ -50,6 +50,9 @@ class ClientMachine(Base):
     public_ip = Column(String)
     internal_ip = Column(String)
     last_active = Column(DateTime)
+    user = Column(String,
+                  ForeignKey('user.uuid'),
+                  nullable=False)
 
 
 class ClientProcess(Base):
