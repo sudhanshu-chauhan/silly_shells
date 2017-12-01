@@ -4,13 +4,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from models import User, SecurityCredential
+from db_handler import HandleDB
 from logger import Logger
 
 logger_instance_params = {
     'file_name': 'error.log',
     'stream_handler': True,
-    'file_handler': True
-}
+    'file_handler': True}
 logger_instance = Logger(**logger_instance_params)
 
 
@@ -33,8 +33,7 @@ class UserController:
                 return False
             param_password_hash = hashlib.md5(password).hexdigest()
             db_password_hash = session_instance.query(SecurityCredential).get(
-                query_result.one().security_credential
-            ).password_hash
+                query_result.one().security_credential).password_hash
             if param_password_hash == db_password_hash:
                 return True
             else:
@@ -45,28 +44,23 @@ class UserController:
             return False
 
 
-class ClientController:
-    """ClientController class to deal with client information exchange."""
-
+class ClientMachineController:
     def __init__(self):
         pass
 
-    def get_client_stats(self):
-        """method to get client cpu/memorh usage."""
-        # code goes here
+    @staticmethod
+    def create_client_machine(**client_params):
+        try:
+            hdb_instance = HandleDB()
+            client_machine = hdb_instance.create_client_machine(
+                **client_params)
+            if client_machine is not None:
+                return client_machine.id
+            else:
+                raise Exception('could not create client machine...')
 
-    def get_process_stats(self, pid):
-        """method to get stat of process running at client side."""
-        # code goes here
-
-    def reboot_client(self):
-        """method to reboot remote client."""
-        # code goes here
-
-    def get_camera_shot(self):
-        """method to get camera shot of the remote client machine."""
-        # code goes here
-
-    def get_client_details(self):
-        """method to fetch client details of remote machine."""
-        # code goes here
+        except Exception as error:
+            logger_instance.logger.error(
+                'ClientMachineController::create_client_machine:{}'.format(
+                    error.message))
+            return None
