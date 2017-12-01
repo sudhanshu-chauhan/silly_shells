@@ -14,8 +14,7 @@ from logger import Logger
 logger_params = {
     'file_name': 'error.log',
     'file_handler': True,
-    'stream_handler': False
-}
+    'stream_handler': False}
 logger_instance = Logger(**logger_params)
 
 
@@ -80,8 +79,7 @@ class HandleDB:
         try:
             secureity_credential_params['uuid'] = str(uuid.uuid4())
             security_credential_instance = SecurityCredential(
-                **secureity_credential_params
-            )
+                **secureity_credential_params)
             self.session_instance.add(security_credential_instance)
             self.session_instance.commit()
             return security_credential_instance
@@ -89,8 +87,7 @@ class HandleDB:
         except Exception as error:
             logger_instance.logger.error(
                 'HandleDB::create_security_credential:{}'.format(
-                    error.message
-                ))
+                    error.message))
             return False
 
     def update_security_credential(self,
