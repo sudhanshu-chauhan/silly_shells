@@ -67,6 +67,14 @@ class SocketOutputHandler(WebSocketHandler):
 
     def on_close(self):
         try:
+            secret_websocket_key = self.request.headers.get(
+                'Sec-Websocket-Key')
+            if hdb_instance.remove_active_client(secret_websocket_key):
+                logger_instance_info.logger.info(
+                    'client removed from server index.')
+            else:
+                logger_instance_info.logger.info('error in removing client!')
+
             logger_instance_info.logger.info(
                 'disconnecting client...')
         except Exception as error:

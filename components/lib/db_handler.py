@@ -199,3 +199,20 @@ class HandleDB:
         except Exception as error:
             logger_instance.logger.error(
                 'HandleDB::add_active_client:{}'.format(error.message))
+
+    def remove_active_client(self, secret_websocket_key):
+        """
+        remove_active_client method to remove client entry
+        from server when client socket connection is closed.
+        """
+        try:
+            removed_client = self.db_mongo.active_clients.find_one_and_delete(
+                {'secret_websocket_key': secret_websocket_key})
+            if removed_client is not None:
+                return True
+            else:
+                return False
+
+        except Exception as error:
+            logger_instance.logger.error(
+                'HandleDB::remove_active_client:{}'.format(error.messaage))
