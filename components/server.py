@@ -7,6 +7,7 @@ import jwt
 
 from lib.logger import Logger
 from lib.controller import UserController, ClientMachineController
+from lib.db_handler import HandleDB
 from lib.conf import settings
 
 logger_instance = Logger(**{
@@ -20,6 +21,7 @@ logger_instance_info = Logger(**{
 
 
 active_clients = []
+hdb_instance = HandleDB()
 
 
 class SocketOutputHandler(WebSocketHandler):
@@ -34,6 +36,16 @@ class SocketOutputHandler(WebSocketHandler):
 
             if 'email' not in payload:
                 self.close()
+            client_params = {}
+            client_params['secret_websocket_key'] = self.request.headers.get(
+                'Sec-Websocket-Key')
+            client_params['client_id'] = self.request.headers.get('client_id')
+            active_client_id = hdb_instance.add_active_client(**client_params)
+            if active_client_id is None:
+                print('could not activate client!')
+                self.close()
+            else:
+                print('client activated: {}'.format(active_client_id))
 
             if self not in active_clients:
                 active_clients.append(self)

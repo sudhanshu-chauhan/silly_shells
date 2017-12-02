@@ -1,5 +1,6 @@
 import uuid
 
+from pymongo import MongoClient
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
@@ -27,6 +28,9 @@ class HandleDB:
         HandleDB __init__ method.
         """
         try:
+            self.mongo_client_instance = MongoClient()
+            self.db_mongo = self.mongo_client_instance['silly_shells']
+
             self.engine = create_engine(DATABASE_URL)
             Session = sessionmaker(bind=self.engine)
 
@@ -175,3 +179,23 @@ class HandleDB:
                 'HandleDB::update_client_process:{}'.format(
                     error.message))
             return None
+
+    def add_active_client(self, **client_params):
+        """
+        add_active_client method to register client on server when
+        new connection is opened by client.
+        """
+        try:
+            active_clients_collection = self.db_mongo.active_clients
+            active_client = active_clients_collection.find_one({
+                'client_id': client_params['client_id']})
+            if active_client is None:
+                active_client_id = active_clients_collection.insert_one(
+                    client_params)
+                return active_client_id
+            else:
+                return None
+
+        except Exception as error:
+            logger_instance.logger.error(
+                'HandleDB::add_active_client:{}'.format(error.message))
