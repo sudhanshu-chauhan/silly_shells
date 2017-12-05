@@ -47,6 +47,8 @@ class HandleDB:
 
         """
         try:
+            if 'is_superuser' in user_params:
+                raise Exception('invalid user params')
             user_params['uuid'] = str(uuid.uuid4())
             current_user = User(**user_params)
             self.session_instance.add(current_user)
@@ -55,6 +57,25 @@ class HandleDB:
         except Exception as error:
             logger_instance.logger.error(
                 'HandleDB::create_user:{}'.format(error.message))
+            return False
+
+    def create_superuser(self, **user_params):
+        """Create Super User method for HandleDB class.
+        Args:
+            user_params (Dict): Parameters for super user object creation.
+        """
+        try:
+            if 'is_superuser' in user_params:
+                raise Exception('invalid user params')
+            user_params['uuid'] = str(uuid.uuid4())
+            user_params['is_superuser'] = True
+            current_user = User(**user_params)
+            self.session_instance.add(current_user)
+            self.session_instance.commit()
+            return current_user
+        except Exception as error:
+            logger_instance.logger.error(
+                'HandleDB::create_superuser:{}'.format(error.message))
             return False
 
     def update_user(self, user_id, **user_params):
