@@ -2,6 +2,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (Column,
                         String,
                         Text,
+                        Boolean,
                         DateTime,
                         ForeignKey)
 from sqlalchemy import create_engine
@@ -25,6 +26,7 @@ class User(Base):
     security_credential = Column(String,
                                  ForeignKey('security_credential.uuid'),
                                  nullable=False)
+    is_superuser = Column(Boolean, default=False)
 
 
 class SecurityCredential(Base):
