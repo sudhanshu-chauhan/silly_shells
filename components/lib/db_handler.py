@@ -1,8 +1,10 @@
+import json
 import uuid
 
 from pymongo import MongoClient
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import DeclarativeMeta
 
 from models import (User,
                     SecurityCredential,
@@ -91,6 +93,19 @@ class HandleDB:
             logger_instance.logger.error(
                 'HandleDB::update_user:{}'.format(
                     error.message))
+            return None
+
+    def list_user(self, **query_params):
+        """Returns users list based on query params."""
+        try:
+            query_params['is_superuser'] = False
+            query_result = self.session_instance.query(
+                User).filter_by(**filter_params)
+            user_list = [user.as_dict() for user in query_result]
+            return user_list
+        except Exception as error:
+            logger_instance.logger.error(
+                'HandleDB::list_user:{}'.format(error.message))
             return None
 
     def create_security_credential(self, **secureity_credential_params):

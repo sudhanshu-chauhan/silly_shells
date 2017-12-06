@@ -43,6 +43,43 @@ class UserController:
                 'UserController::authenticate:{}'.format(error.message))
             return False
 
+    @staticmethod
+    def authenticate_superuser(email, password):
+        try:
+            query_result = session_instance.query(
+                User).filter(User.email == email)
+            if query_result.count() == 0:
+                return False
+            param_password_hash = hashlib.md5(password).hexdigest()
+            current_user = query_result.one()
+            db_password_hash = session_instance.query(SecurityCredential).get(
+                current_user.security_credential).password_hash
+            if db_password_hash == param_password_hash:
+                if current_user.is_superuser is True:
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        except Exception as error:
+            logger_instance.logger.error(
+                'UserController::authenticate_superuser:{}'.format(
+                    error.message))
+
+    @staticmethod
+    def get_users(**user_params):
+        try:
+            users_list = hdb_instance.list_user(**user_params)
+            if users_list is not None:
+                return users_list
+            else:
+                return []
+        except Exception as error:
+            logger_instance.logger.error(
+                'UserController::get_users:{}'.format(error.message))
+            return None
+
 
 class ClientMachineController:
     def __init__(self):
