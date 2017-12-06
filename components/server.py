@@ -116,6 +116,29 @@ class ClientAuthentication(RequestHandler):
                 'ClientAuthentication::post:{}'.format(error.message))
 
 
+class SuperUserAuthentication(RequestHandler):
+    def post(self, *args, **kwargs):
+        try:
+            post_param = json.loads(self.request.body)
+            if 'email' not in post_param or 'password' not in post_param:
+                raise KeyError
+            if UserController.authenticate_superuser(post_param['email'],
+                                                     post_param['password']):
+                payload = {
+                    'email': post_param['email'],
+                    'password': post_param['password']}
+                response_json = {'token': jwt.encode(
+                    payload, settings.JWT_SECRET, algorithm='HS512')}
+                self.write(json.dumps(response_json))
+            else:
+                self.clear()
+                self.set_status(403)
+                self.write('<html><body>invalid credentials</body></html>')
+        except Exception as error:
+            logger_instance.logger.error(
+                'SuperUserAuthentication::post:{}'.format(error.message))
+
+
 class Machine(RequestHandler):
     """Machine class to create/list machine instances."""
 
@@ -146,13 +169,21 @@ class Machine(RequestHandler):
                 'Machine::post:{}'.format(error.message))
 
 
+class User(RequestHandler):
+    """User request handler class."""
+
+    def get(self, *args, **kwargs):
+        import ipdb; ipdb.set_trace()
+
 class MainApplication(Application):
 
     def __init__(self):
         handlers = [
             (r'/sock_server/', SocketOutputHandler),
             (r'/get_token/', ClientAuthentication),
-            (r'/create_machine/', Machine)]
+            (r'/get_super_token/', SuperUserAuthentication),
+            (r'/create_machine/', Machine),
+            (r'/users/', User), ]
 
         Application.__init__(self, handlers)
 
