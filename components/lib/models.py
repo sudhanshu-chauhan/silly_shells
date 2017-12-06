@@ -28,13 +28,18 @@ class User(Base):
                                  nullable=False)
     is_superuser = Column(Boolean, default=False)
 
+    def as_dict(self):
+
+        return {
+            column.name: getattr(self, column.name) for column in self.__table__.columns}
+
 
 class SecurityCredential(Base):
     """
     SecureityCredentials model class to security creds for user.
     """
     __tablename__ = "security_credential"
-
+    
     uuid = Column(String, primary_key=True)
     password_hash = Column(String)
 
