@@ -100,7 +100,7 @@ class HandleDB:
         try:
             query_params['is_superuser'] = False
             query_result = self.session_instance.query(
-                User).filter_by(**filter_params)
+                User).filter_by(**query_params)
             user_list = [user.as_dict() for user in query_result]
             return user_list
         except Exception as error:

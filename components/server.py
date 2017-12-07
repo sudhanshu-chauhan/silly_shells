@@ -1,9 +1,12 @@
 import json
+import os
 
+import jwt
 from tornado.ioloop import IOLoop
 from tornado.websocket import WebSocketHandler
 from tornado.web import Application, RequestHandler
-import jwt
+from tornado.web import StaticFileHandler
+
 
 from lib.logger import Logger
 from lib.controller import UserController, ClientMachineController
@@ -169,11 +172,28 @@ class Machine(RequestHandler):
                 'Machine::post:{}'.format(error.message))
 
 
+class SuperUser(RequestHandler):
+    """SuperUser class for frontend rendering."""
+
+    def get(self):
+        self.render('./template/superuser.html')
+
+
 class User(RequestHandler):
     """User request handler class."""
 
     def get(self, *args, **kwargs):
-        import ipdb; ipdb.set_trace()
+        token = self.request.headers.get('Authorization')
+        if not UserController.verify_superuser_token(token):
+            self.clear()
+            self.set_status(403)
+            self.write('<html><body>invalid token</body></html>')
+
+        filter_params = {}
+        users_list = UserController.get_users(**filter_params)
+        self.set_header('Content-Type', 'application/json')
+        self.write(json.dumps(users_list))
+
 
 class MainApplication(Application):
 
@@ -181,9 +201,13 @@ class MainApplication(Application):
         handlers = [
             (r'/sock_server/', SocketOutputHandler),
             (r'/get_token/', ClientAuthentication),
-            (r'/get_super_token/', SuperUserAuthentication),
+            (r'/get_superuser_token/', SuperUserAuthentication),
             (r'/create_machine/', Machine),
-            (r'/users/', User), ]
+            (r'/users/', User),
+            (r'/static/(.*)',
+             StaticFileHandler,
+             {'path': os.path.join(os.curdir, 'static')}),
+            (r'/superuser/', SuperUser), ]
 
         Application.__init__(self, handlers)
 

@@ -2,6 +2,7 @@ import hashlib
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import jwt
 
 from models import User, SecurityCredential
 from db_handler import HandleDB
@@ -68,8 +69,32 @@ class UserController:
                     error.message))
 
     @staticmethod
+    def verify_superuser_token(token):
+        try:
+            payload = jwt.decode(token, verify=False)
+            if 'email' not in payload:
+                return False
+            hdb_instance = HandleDB()
+            filter_params = {
+                'email': payload['email'],
+                'is_superuser': True
+            }
+            query_result = hdb_instance.session_instance.query(
+                User).filter_by(**filter_params)
+            if query_result.count == 0:
+                return False
+            else:
+                return True
+        except Exception as error:
+            logger_instance.logger.error(
+                'UserController::verify_superuser_token:{}'.format(
+                    error.message))
+            return False
+
+    @staticmethod
     def get_users(**user_params):
         try:
+            hdb_instance = HandleDB()
             users_list = hdb_instance.list_user(**user_params)
             if users_list is not None:
                 return users_list
